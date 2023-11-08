@@ -9,6 +9,7 @@ use p3_field::{
 use rand::distributions::{Distribution, Standard};
 use rand::Rng;
 
+// 2^31 - 2^27 + 1 = 2^27 * (2^4 - 1) + 1 = 15 * 2^27 + 1
 const P: u32 = 0x78000001;
 const MONTY_BITS: u32 = 31;
 const MONTY_MASK: u32 = (1 << MONTY_BITS) - 1;
@@ -332,6 +333,7 @@ impl Div for BabyBear {
 #[inline]
 #[must_use]
 const fn to_monty(x: u32) -> u32 {
+    // R = 2^32
     (((x as u64) << 31) % P as u64) as u32
 }
 

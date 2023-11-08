@@ -156,6 +156,8 @@ impl AbstractField for Mersenne31 {
     #[inline]
     fn from_wrapped_u32(n: u32) -> Self {
         // To reduce `n` to 31 bits, we clear its MSB, then add it back in its reduced form.
+        // 2^31 * msb + (n & (2^31 - 1)
+        // 2^31 = 1 (mod p)
         let msb = n & (1 << 31);
         let msb_reduced = msb >> 31;
         Self::new(n ^ msb) + Self::new(msb_reduced)
@@ -239,7 +241,7 @@ impl Field for Mersenne31 {
 impl PrimeField for Mersenne31 {}
 
 impl PrimeField32 for Mersenne31 {
-    const ORDER_U32: u32 = (1 << 31) - 1;
+    const ORDER_U32: u32 = (1 << 31) - 1; // 2^31 - 1 = 0x7fffffff
 
     #[inline]
     fn as_canonical_u32(&self) -> u32 {
