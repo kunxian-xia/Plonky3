@@ -1,4 +1,5 @@
 use alloc::vec::Vec;
+use std::any::type_name;
 use std::time::Instant;
 
 use p3_field::{Field, TwoAdicField};
@@ -28,7 +29,12 @@ impl<F: TwoAdicField> TwoAdicSubgroupDft<F> for Radix2Dit {
         for layer in 0..log_h {
             let layer_dur = Instant::now();
             dit_layer(&mut mat.as_view_mut(), layer, &twiddles);
-            log::info!("layer {} of height {} took {:?}", layer, h, layer_dur.elapsed());
+            log::info!(
+                "layer {} of height {} took {:?}",
+                layer,
+                h,
+                layer_dur.elapsed()
+            );
         }
         mat
     }
@@ -45,6 +51,11 @@ fn dit_layer<F: Field>(mat: &mut RowMajorMatrixViewMut<F>, layer: usize, twiddle
 
     let width = mat.width();
 
+    log::debug!(
+        "{}::Packing: {}",
+        type_name::<F>(),
+        std::mem::size_of::<F::Packing>() / std::mem::size_of::<F>()
+    );
     mat.par_row_chunks_mut(block_size).for_each(|block_chunks| {
         let (hi_chunks, lo_chunks) = block_chunks.split_at_mut(half_block_size * width);
         hi_chunks
