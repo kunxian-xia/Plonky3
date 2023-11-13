@@ -3,6 +3,7 @@
 #![no_std]
 
 extern crate alloc;
+extern crate std;
 
 mod butterflies;
 mod naive;

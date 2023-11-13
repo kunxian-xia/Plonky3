@@ -11,6 +11,7 @@ use rand::distributions::{Distribution, Standard};
 use rand::thread_rng;
 
 fn bench_fft(c: &mut Criterion) {
+    env_logger::try_init();
     // log_sizes correspond to the sizes of DFT we want to benchmark;
     // for the DFT over the quadratic extension "Mersenne31Complex" a
     // fairer comparison is to use half sizes, which is the log minus 1.

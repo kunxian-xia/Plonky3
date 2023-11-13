@@ -52,6 +52,7 @@ pub trait TwoAdicSubgroupDft<F: TwoAdicField>: Clone + Default {
 
         divide_by_height(&mut dft);
 
+        // why???????
         for row in 1..h / 2 {
             swap_rows(&mut dft, row, h - row);
         }

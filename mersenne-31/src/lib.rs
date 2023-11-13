@@ -352,6 +352,7 @@ impl Mul for Mersenne31 {
         let prod = u64::from(self.value) * u64::from(rhs.value);
         let prod_lo = (prod as u32) & ((1 << 31) - 1);
         let prod_hi = (prod >> 31) as u32;
+        // prod_hi * 2^31 + prod_lo
         Self::new(prod_lo) + Self::new(prod_hi)
     }
 }

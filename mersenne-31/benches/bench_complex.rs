@@ -1,28 +1,12 @@
-use std::ops::{Add, Mul};
-use criterion::{criterion_group, criterion_main, BatchSize, Criterion};
+use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use rand::Rng;
-use p3_baby_bear::BabyBear;
 use p3_field::AbstractField;
+use p3_mersenne_31::{Mersenne31, Mersenne31Complex};
 
-type F = BabyBear;
+fn bench_m31_complex(c: &mut Criterion) {
+    type F = Mersenne31Complex<Mersenne31>;
+    c.bench_function("complex-add-latency", |b|
 
-fn root_7(c: &mut Criterion) {
-    c.bench_function("7th_root", |b| {
-        b.iter_batched(
-            rand::random::<F>,
-            // m = 1725656503
-            // 7*m = 1 (mod p-1)
-            // p = 2^31 - 2^27 + 1
-            |x| x.exp_u64(1725656503),
-            BatchSize::SmallInput,
-        )
-    });
-}
-
-fn add_mul(c: &mut Criterion) {
-    type F = BabyBear;
-
-    c.bench_function("add-latency", |b| {
         b.iter_batched(
             || {
                 let mut rng = rand::thread_rng();
@@ -34,11 +18,11 @@ fn add_mul(c: &mut Criterion) {
                 vec
             },
             |x| x.iter().fold(F::zero(), |x, y| x + *y),
-                BatchSize::SmallInput,
+            BatchSize::SmallInput,
         )
-    });
+    );
 
-    c.bench_function("add-throughput", |b| {
+    c.bench_function("complex-add-throughput", |b| {
         b.iter_batched(
             || {
                 let mut rng = rand::thread_rng();
@@ -76,7 +60,8 @@ fn add_mul(c: &mut Criterion) {
         )
     });
 
-    c.bench_function("mul-latency", |b| {
+    c.bench_function("complex-mul-latency", |b|
+
         b.iter_batched(
             || {
                 let mut rng = rand::thread_rng();
@@ -90,9 +75,9 @@ fn add_mul(c: &mut Criterion) {
             |x| x.iter().fold(F::zero(), |x, y| x * *y),
             BatchSize::SmallInput,
         )
-    });
+    );
 
-    c.bench_function("mul-throughput", |b| {
+    c.bench_function("complex-mul-throughput", |b| {
         b.iter_batched(
             || {
                 let mut rng = rand::thread_rng();
@@ -129,23 +114,7 @@ fn add_mul(c: &mut Criterion) {
             BatchSize::SmallInput,
         )
     });
-
-    c.bench_function("add", |b| {
-        b.iter_batched(
-            || (rand::random::<F>(), rand::random::<F>()),
-            |(x, y)| x.add(y),
-            BatchSize::SmallInput,
-        )
-    });
-
-    c.bench_function("mul", |b| {
-        b.iter_batched(
-            || (rand::random::<F>(), rand::random::<F>()),
-            |(x, y)| x.mul(y),
-            BatchSize::SmallInput,
-        )
-    });
 }
 
-criterion_group!(baby_bear_arithmetic, root_7, add_mul);
-criterion_main!(baby_bear_arithmetic);
+criterion_group!(mersenne31_arithmetics, bench_m31_complex);
+criterion_main!(mersenne31_arithmetics);

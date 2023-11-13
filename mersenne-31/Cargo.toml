@@ -19,6 +19,10 @@ name = "bench_field"
 harness = false
 
 [[bench]]
+name = "bench_complex"
+harness = false
+
+[[bench]]
 name = "extension"
 harness = false
 

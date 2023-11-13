@@ -1,4 +1,5 @@
 use alloc::vec::Vec;
+use std::time::Instant;
 
 use p3_field::{Field, TwoAdicField};
 use p3_matrix::dense::{RowMajorMatrix, RowMajorMatrixViewMut};
@@ -25,7 +26,9 @@ impl<F: TwoAdicField> TwoAdicSubgroupDft<F> for Radix2Dit {
         // DIT butterfly
         reverse_matrix_index_bits(&mut mat);
         for layer in 0..log_h {
+            let layer_dur = Instant::now();
             dit_layer(&mut mat.as_view_mut(), layer, &twiddles);
+            log::info!("layer {} of height {} took {:?}", layer, h, layer_dur.elapsed());
         }
         mat
     }

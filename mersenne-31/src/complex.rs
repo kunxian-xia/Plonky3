@@ -135,6 +135,13 @@ impl<AF: AbstractField<F = Mersenne31>> Mul for Mersenne31Complex<AF> {
         //     real = t1 - t2
         //     imag = (a + b) * (c + d) - t1 - t2
 
+        // let t1 = self.real() * rhs.real();
+        // let t2 = self.imag() * rhs.imag();
+        // let t = (self.real() + self.imag()) * (rhs.real() + rhs.imag());
+        //
+        // let real = t1.clone() - t2.clone();
+        // let imag = t - (t1 + t2);
+
         let real = self.real() * rhs.real() - self.imag() * rhs.imag();
         let imag = self.real() * rhs.imag() + self.imag() * rhs.real();
         Self::new(real, imag)
@@ -144,6 +151,7 @@ impl<AF: AbstractField<F = Mersenne31>> Mul for Mersenne31Complex<AF> {
 impl<AF: AbstractField<F = Mersenne31>> Mul<AF> for Mersenne31Complex<AF> {
     type Output = Self;
 
+    // (a+bi) * c = a*c + b*c i
     fn mul(self, rhs: AF) -> Self {
         Self::new(self.real() * rhs.clone(), self.imag() * rhs)
     }
