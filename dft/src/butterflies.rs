@@ -99,6 +99,11 @@ fn dit<F: Field>(
     suffix_2: &mut [F],
     twiddle: F,
 ) {
+    log::debug!("prefix.len = {}, suffix.len = {}, shorts.len = {}",
+        prefix_1.len(),
+        suffix_1.len(),
+        shorts_1.len(),
+    );
     for (x_1, x_2) in prefix_1.iter_mut().zip(prefix_2) {
         let x_2_twiddle = *x_2 * twiddle;
         let sum = *x_1 + x_2_twiddle;

@@ -3,7 +3,7 @@ use core::iter::{Product, Sum};
 use core::mem::transmute;
 use core::ops::{Add, AddAssign, Div, Mul, MulAssign, Neg, Sub, SubAssign};
 
-use p3_field::{AbstractField, AbstractionOf, Field, PackedField};
+use p3_field::{AbstractField, Field, PackedField};
 
 use crate::Mersenne31;
 
@@ -313,10 +313,16 @@ impl Product for PackedMersenne31Neon {
 }
 
 impl AbstractField for PackedMersenne31Neon {
+    type F = Mersenne31;
+
     fn zero() -> Self { Self::broadcast(Mersenne31::zero())}
     fn one() -> Self { Self::broadcast(Mersenne31::one())}
     fn two() -> Self { Self::broadcast(Mersenne31::two())}
     fn neg_one() -> Self { Self::broadcast(Mersenne31::neg_one())}
+
+    fn from_f(f: Self::F) -> Self {
+        f.into()
+    }
 
     #[inline]
     #[must_use]
@@ -360,11 +366,15 @@ impl AbstractField for PackedMersenne31Neon {
         Mersenne31::from_wrapped_u64(n).into()
     }
 
-    #[inline]
-    #[must_use]
-    fn multiplicative_group_generator() -> Self {
-        Mersenne31::multiplicative_group_generator().into()
+    fn generator() -> Self {
+        Mersenne31::generator().into()
     }
+
+    // #[inline]
+    // #[must_use]
+    // fn multiplicative_group_generator() -> Self {
+    //     Mersenne31::multiplicative_group_generator().into()
+    // }
 }
 
 impl Add<Mersenne31> for PackedMersenne31Neon {
@@ -437,7 +447,7 @@ impl Product<Mersenne31> for PackedMersenne31Neon {
     }
 }
 
-impl AbstractionOf<Mersenne31> for PackedMersenne31Neon {}
+// impl AbstractionOf<Mersenne31> for PackedMersenne31Neon {}
 
 impl Div<Mersenne31> for PackedMersenne31Neon {
     type Output = Self;

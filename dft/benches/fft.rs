@@ -21,14 +21,14 @@ fn bench_fft(c: &mut Criterion) {
     const BATCH_SIZE: usize = 100;
 
     fft::<BabyBear, Radix2Dit, BATCH_SIZE>(c, log_sizes);
-    fft::<BabyBear, Radix2Bowers, BATCH_SIZE>(c, log_sizes);
-    fft::<BabyBear, Radix2DitParallel, BATCH_SIZE>(c, log_sizes);
+    // fft::<BabyBear, Radix2Bowers, BATCH_SIZE>(c, log_sizes);
+    // fft::<BabyBear, Radix2DitParallel, BATCH_SIZE>(c, log_sizes);
     fft::<Goldilocks, Radix2Dit, BATCH_SIZE>(c, log_sizes);
-    fft::<Goldilocks, Radix2Bowers, BATCH_SIZE>(c, log_sizes);
-    fft::<Goldilocks, Radix2DitParallel, BATCH_SIZE>(c, log_sizes);
+    // fft::<Goldilocks, Radix2Bowers, BATCH_SIZE>(c, log_sizes);
+    // fft::<Goldilocks, Radix2DitParallel, BATCH_SIZE>(c, log_sizes);
     fft::<Mersenne31Complex<Mersenne31>, Radix2Dit, BATCH_SIZE>(c, log_half_sizes);
-    fft::<Mersenne31Complex<Mersenne31>, Radix2Bowers, BATCH_SIZE>(c, log_half_sizes);
-    fft::<Mersenne31Complex<Mersenne31>, Radix2DitParallel, BATCH_SIZE>(c, log_half_sizes);
+    // fft::<Mersenne31Complex<Mersenne31>, Radix2Bowers, BATCH_SIZE>(c, log_half_sizes);
+    // fft::<Mersenne31Complex<Mersenne31>, Radix2DitParallel, BATCH_SIZE>(c, log_half_sizes);
 
     fft::<Mersenne31Complex<Mersenne31>, Mersenne31ComplexRadix2Dit, BATCH_SIZE>(c, log_half_sizes);
     m31_fft::<Radix2Dit, BATCH_SIZE>(c, log_sizes);

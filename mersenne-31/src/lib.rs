@@ -9,6 +9,12 @@ mod dft;
 mod extension;
 mod radix_2_dit;
 
+#[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
+mod aarch64_neon;
+
+#[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
+pub use aarch64_neon::*;
+
 use core::fmt;
 use core::fmt::{Debug, Display, Formatter};
 use core::hash::{Hash, Hasher};
@@ -180,6 +186,10 @@ impl AbstractField for Mersenne31 {
 
 impl Field for Mersenne31 {
     // TODO: Add cfg-guarded Packing for AVX2, NEON, etc.
+    #[cfg(all(target_arch = "aarch64", target_feature = "neon"))]
+    type Packing = PackedMersenne31Neon;
+
+    #[cfg(not(all(target_arch = "aarch64", target_feature = "neon")))]
     type Packing = Self;
 
     #[inline]
