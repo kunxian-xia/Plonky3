@@ -1,12 +1,11 @@
-use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
-use rand::Rng;
+use criterion::{criterion_group, criterion_main, BatchSize, Criterion};
 use p3_field::AbstractField;
 use p3_mersenne_31::{Mersenne31, Mersenne31Complex};
+use rand::Rng;
 
 fn bench_m31_complex(c: &mut Criterion) {
     type F = Mersenne31Complex<Mersenne31>;
-    c.bench_function("complex-add-latency", |b|
-
+    c.bench_function("complex-add-latency", |b| {
         b.iter_batched(
             || {
                 let mut rng = rand::thread_rng();
@@ -20,7 +19,7 @@ fn bench_m31_complex(c: &mut Criterion) {
             |x| x.iter().fold(F::zero(), |x, y| x + *y),
             BatchSize::SmallInput,
         )
-    );
+    });
 
     c.bench_function("complex-add-throughput", |b| {
         b.iter_batched(
@@ -60,8 +59,7 @@ fn bench_m31_complex(c: &mut Criterion) {
         )
     });
 
-    c.bench_function("complex-mul-latency", |b|
-
+    c.bench_function("complex-mul-latency", |b| {
         b.iter_batched(
             || {
                 let mut rng = rand::thread_rng();
@@ -75,7 +73,7 @@ fn bench_m31_complex(c: &mut Criterion) {
             |x| x.iter().fold(F::zero(), |x, y| x * *y),
             BatchSize::SmallInput,
         )
-    );
+    });
 
     c.bench_function("complex-mul-throughput", |b| {
         b.iter_batched(

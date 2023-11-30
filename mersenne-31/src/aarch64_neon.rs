@@ -196,7 +196,7 @@ fn mul(lhs: uint32x4_t, rhs: uint32x4_t) -> uint32x4_t {
     //     = prod_lo32 - prod_hi31 * P                                                   (mod 2^32)
     //
     // t is in 0, ..., 2 P, so we apply reduce_sum to get the result.
-    
+
     unsafe {
         // Safety: If this code got compiled then NEON intrinsics are available.
         let prod_hi31 = mul_31x31_to_hi_31(lhs, rhs);
@@ -315,10 +315,18 @@ impl Product for PackedMersenne31Neon {
 impl AbstractField for PackedMersenne31Neon {
     type F = Mersenne31;
 
-    fn zero() -> Self { Self::broadcast(Mersenne31::zero())}
-    fn one() -> Self { Self::broadcast(Mersenne31::one())}
-    fn two() -> Self { Self::broadcast(Mersenne31::two())}
-    fn neg_one() -> Self { Self::broadcast(Mersenne31::neg_one())}
+    fn zero() -> Self {
+        Self::broadcast(Mersenne31::zero())
+    }
+    fn one() -> Self {
+        Self::broadcast(Mersenne31::one())
+    }
+    fn two() -> Self {
+        Self::broadcast(Mersenne31::two())
+    }
+    fn neg_one() -> Self {
+        Self::broadcast(Mersenne31::neg_one())
+    }
 
     fn from_f(f: Self::F) -> Self {
         f.into()

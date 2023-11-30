@@ -1,8 +1,8 @@
-use std::ops::{Add, Mul};
 use criterion::{criterion_group, criterion_main, BatchSize, Criterion};
-use rand::Rng;
 use p3_baby_bear::BabyBear;
 use p3_field::AbstractField;
+use rand::Rng;
+use std::ops::{Add, Mul};
 
 type F = BabyBear;
 
@@ -34,7 +34,7 @@ fn add_mul(c: &mut Criterion) {
                 vec
             },
             |x| x.iter().fold(F::zero(), |x, y| x + *y),
-                BatchSize::SmallInput,
+            BatchSize::SmallInput,
         )
     });
 
