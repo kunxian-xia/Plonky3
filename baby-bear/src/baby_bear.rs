@@ -9,11 +9,22 @@ use p3_field::{
 use rand::distributions::{Distribution, Standard};
 use rand::Rng;
 
-// 2^31 - 2^27 + 1 = 2^27 * (2^4 - 1) + 1 = 15 * 2^27 + 1
+// montgomery reduction
+//  assume 0 <= a, b < p,
+//  let c = a*b, d = c - k*p.
+//  find k s.t. d = 0 (mod R) and d = c (mod p)
+//  then it's easy to see we can use k = p^(-1)*c (mod R)
+//
+//  p = 2^31 - 2^27 + 1
+//  R = 2^31
+//  p^(-1) (mod R) = 2^27 + 1
+//
+
+// p = 2^31 - 2^27 + 1 = 2^27 * (2^4 - 1) + 1 = 15 * 2^27 + 1
 const P: u32 = 0x78000001;
-const MONTY_BITS: u32 = 31;
+const MONTY_BITS: u32 = 31; // R = 2^31
 const MONTY_MASK: u32 = (1 << MONTY_BITS) - 1;
-const MONTY_MU: u32 = 0x8000001;
+const MONTY_MU: u32 = 0x8000001; // p^(-1) (mod R)
 
 /// The prime field `2^31 - 2^27 + 1`, a.k.a. the Baby Bear field.
 #[derive(Copy, Clone, Default, Eq, Hash, PartialEq)]
@@ -59,7 +70,9 @@ impl Debug for BabyBear {
 impl Distribution<BabyBear> for Standard {
     #[inline]
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> BabyBear {
+        // use rejection sampling
         loop {
+            // typo here???
             let next_u31 = rng.next_u32() & 0x7ffffff;
             let is_canonical = next_u31 < P;
             if is_canonical {
@@ -75,12 +88,16 @@ impl AbstractField for BabyBear {
     fn zero() -> Self {
         Self { value: 0 }
     }
+    // R = 2^31
+    // 1*R (mod p) = 2^27 - 1
     fn one() -> Self {
         Self { value: 0x7ffffff }
     }
+    // 2*R (mod p) = 2^28 - 2
     fn two() -> Self {
         Self { value: 0xffffffe }
     }
+    // -R (mod p) = 2p - R = 2^31 - 2^28 + 2
     fn neg_one() -> Self {
         Self { value: 0x70000002 }
     }
@@ -244,6 +261,8 @@ impl Add for BabyBear {
     #[inline]
     fn add(self, rhs: Self) -> Self {
         let mut sum = self.value + rhs.value;
+        // over means (aR + bR) < p, return sum
+        // !over means (aR + bR) >= p, return corr_sum
         let (corr_sum, over) = sum.overflowing_sub(P);
         if !over {
             sum = corr_sum;
@@ -333,7 +352,8 @@ impl Div for BabyBear {
 #[inline]
 #[must_use]
 const fn to_monty(x: u32) -> u32 {
-    // R = 2^32
+    // R = 2^31
+    // aR (mod p)
     (((x as u64) << 31) % P as u64) as u32
 }
 
@@ -346,6 +366,7 @@ fn to_monty_64(x: u64) -> u32 {
 #[inline]
 #[must_use]
 fn from_monty(x: u32) -> u32 {
+    // a = a*R*R^(-1)
     monty_reduce(x as u64)
 }
 
@@ -353,11 +374,22 @@ fn from_monty(x: u32) -> u32 {
 #[inline]
 #[must_use]
 fn monty_reduce(x: u64) -> u32 {
+    // aR * bR * R^(-1)
+    // a'*b'*R^(-1)
+    // x = a'*b'
+    // t = k = x*p^(-1) (mod R)
+    // monty_mu = p^(-1) (mod R)
     let t = x.wrapping_mul(MONTY_MU as u64) & (MONTY_MASK as u64);
+    // d = x - t*p = 0 (mod R)
+    //   = x (mod p)
+    // if x < t*p, then let d = x - t*p + R*p
+    // else let d = x - t*p
+
+    // let e = d / R
     let u = t * (P as u64);
 
     let (x_sub_u, over) = x.overflowing_sub(u);
-    let x_sub_u_hi = (x_sub_u >> 31) as u32;
+    let x_sub_u_hi = (x_sub_u >> MONTY_BITS) as u32;
     let corr = if over { P } else { 0 };
     x_sub_u_hi.wrapping_add(corr)
 }
